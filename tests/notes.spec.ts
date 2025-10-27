@@ -5,7 +5,7 @@ import { deleteUser, deleteNote } from "../utils/teardown";
 import { setupUser, generateNote } from "../utils/setup";
 import { Note } from "../utils/note";
 
-test.describe("User API", () => {
+test.describe("Notes API", () => {
   let user: User;
   let note: Note;
 
