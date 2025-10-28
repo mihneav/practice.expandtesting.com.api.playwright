@@ -31,7 +31,6 @@ export async function deleteNote(user: User, note: Note): Promise<APIResponse> {
       id: note.id,
     },
   });
-  const body = await response.json();
-  user.addNote(body as Note);
+  await response.json();
   return response;
 }

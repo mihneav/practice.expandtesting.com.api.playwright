@@ -16,8 +16,8 @@ test.describe("Notes API", () => {
 
   test.afterEach(async () => {
     if (user.notes.length > 0) {
-      for (const noteId of user.notes) {
-        await deleteNote(user, noteId);
+      for (const note of user.notes) {
+        await deleteNote(user, note);
       }
     }
     if (user.token) {
