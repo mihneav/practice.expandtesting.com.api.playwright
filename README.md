@@ -1,4 +1,4 @@
-# practice. expandtesting.com. api. playwright
+# practice. expandtesting.com.api.playwright
 
 Automated API tests for [ExpandTesting.com](https://practice.expandtesting.com/) using **Playwright** and **TypeScript**.
 
