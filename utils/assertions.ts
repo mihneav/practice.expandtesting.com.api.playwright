@@ -1,6 +1,18 @@
 import { expect, APIResponse } from "@playwright/test";
 import { StatusCodes } from "http-status-codes";
 
+/**
+ * Validates that an API response indicates success with expected data
+ *
+ * @param response - The API response to validate
+ * @param expectedData - Optional object to match against response.data
+ * @param expectedStatus - HTTP status code, defaults to 200 OK
+ * @param expectedMessage - Optional message string to match against response.message
+ * @throws AssertionError if any expectation fails
+ *
+ * @example
+ * await expectSuccessResponse(response, { id: "123" }, StatusCodes.CREATED, "User created");
+ */
 export async function expectSuccessResponse(
   response: APIResponse,
   expectedData?: Object,
@@ -21,31 +33,16 @@ export async function expectSuccessResponse(
   }
 }
 
-// export async function noteAssertions(
-//   response: APIResponse,
-//   expectedCompleted: string,
-//   user: User,
-//   noteData?: Note,
-// ): Promise<void> {
-//   await expectSuccessResponse(
-//     response,
-//     {
-//       id: expect.any(String),
-//       title: noteData?.title,
-//       description: noteData?.description,
-//       category: noteData?.category,
-//       completed: expectedCompleted === "true",
-//       created_at: expect.any(String),
-//       updated_at: expect.any(String),
-//       user_id: user.id,
-//     },
-//     StatusCodes.OK,
-//     expectedCompleted === "true"
-//       ? "Note successfully Updated"
-//       : "Note successfully created",
-//   );
-// }
-
+/**
+ * Validates that the updated_at timestamp is greater than created_at timestamp
+ *
+ * @param response - The API response containing timestamps
+ * @param createdAt - ISO 8601 timestamp string of creation time
+ * @throws AssertionError if updated_at is not greater than createdAt
+ *
+ * @example
+ * await expectUpdatedAtGreaterThanCreatedAt(response, note.getCreatedAt());
+ */
 export async function expectUpdatedAtGreaterThanCreatedAt(
   response: APIResponse,
   createdAt: string,
