@@ -1,49 +1,53 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
+//Load environment variables from .env file
+dotenv.config();
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
-  testDir: "./tests",
-  /* Run tests in files in parallel */
+  testDir: "./tests/",
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  timeout: 5 * 1000,
-  expect: {
-    timeout: 5000,
-  },
-  use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: "https://practice.expandtesting.com/notes/api/",
+  retries: process.env.CI ? 2 : 1,
+  workers: process.env.CI ? 1 : undefined, // Use default workers locally
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+  reporter: [["html"], ["list"]],
+
+  // Increased timeout for API tests with potential network latency
+  timeout: 30 * 1000,
+
+  expect: {
+    timeout: 10000,
+  },
+
+  use: {
+    baseURL: process.env.BASE_URL || "https://practice.expandtesting.com/",
     trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
 
     extraHTTPHeaders: {
-      // We set this header per GitHub guidelines.
-      Accept: "application/vnd.github.v3+json",
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: "API Tests",
-      testMatch: ["**/*.spec.ts"],
+      testMatch: ["**/api/*.spec.ts"],
+      use: {
+        screenshot: "off",
+        video: "off",
+      },
+    },
+    {
+      name: "E2E Tests",
+      testMatch: ["**/e2e/*.spec.ts"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 720 },
+      },
     },
   ],
 });

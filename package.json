@@ -1,10 +1,23 @@
 {
   "name": "practice.expandtesting.com.api.playwright",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright test suite for practice.expandtesting.com",
   "main": "index.js",
-  "scripts": {},
-  "keywords": [],
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project='API Tests'",
+    "test:e2e": "playwright test --project='E2E Tests'",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "ui": "playwright test --ui"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "api",
+    "e2e"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -13,6 +26,7 @@
     "@types/node": "^24.9.1"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "http-status-codes": "^2.3.0"
   }
 }

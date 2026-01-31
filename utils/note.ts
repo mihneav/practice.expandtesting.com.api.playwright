@@ -1,12 +1,12 @@
 export class Note {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  completed: boolean;
-  user_id: string;
-  created_at?: string;
-  updated_at?: string;
+  private id: string;
+  private title: string;
+  private description: string;
+  private category: string;
+  private completed: boolean;
+  private user_id: string;
+  private created_at?: string;
+  private updated_at?: string;
 
   constructor(
     id: string,
@@ -16,7 +16,7 @@ export class Note {
     completed: boolean,
     user_id: string,
     created_at?: string,
-    updated_at?: string
+    updated_at?: string,
   ) {
     this.id = id;
     this.title = title;
@@ -28,13 +28,95 @@ export class Note {
     this.updated_at = updated_at;
   }
 
-  public static async createNote(userId: string): Promise<Note> {
+  // Getters
+  public getId(): string {
+    return this.id;
+  }
+
+  public getTitle(): string {
+    return this.title;
+  }
+
+  public getDescription(): string {
+    return this.description;
+  }
+
+  public getCategory(): string {
+    return this.category;
+  }
+
+  public getCompleted(): boolean {
+    return this.completed;
+  }
+
+  public getUserId(): string {
+    return this.user_id;
+  }
+
+  public getCreatedAt(): string | undefined {
+    return this.created_at;
+  }
+
+  public getUpdatedAt(): string | undefined {
+    return this.updated_at;
+  }
+
+  // Setters for mutable properties used in tests
+  public setTitle(title: string): void {
+    this.title = title;
+  }
+
+  public setDescription(description: string): void {
+    this.description = description;
+  }
+
+  public setCategory(category: string): void {
+    this.category = category;
+  }
+
+  public setCompleted(completed: boolean): void {
+    this.completed = completed;
+  }
+
+  /**
+   * Factory method to create a Note instance from API response data
+   * @param data - The note data from API response
+   * @returns A new Note instance
+   *
+   * @example
+   * const note = Note.fromResponse(body.data);
+   */
+  public static fromResponse(data: any): Note {
+    return new Note(
+      data.id,
+      data.title,
+      data.description,
+      data.category,
+      data.completed,
+      data.user_id,
+      data.created_at,
+      data.updated_at,
+    );
+  }
+
+  /**
+   * Factory method to create a random Note for testing
+   * @param userId - The user ID to associate with the note
+   * @param category - Optional category, defaults to random selection
+   * @returns A new Note instance with fake data
+   *
+   * @example
+   * const note = await Note.createNote(user.getId(), "Work");
+   */
+  public static async createNote(
+    userId: string,
+    category?: string,
+  ): Promise<Note> {
     const { faker } = await import("@faker-js/faker");
     const id = "";
     const title = faker.lorem.sentence();
     const description = faker.lorem.paragraph();
-    const category = faker.helpers.arrayElement(["Work", "Personal", "Home"]);
-    const completed = false; // faker.datatype.boolean();
+    const completed = false;
     const created_at = faker.date.past().toISOString();
     const updated_at = faker.date.recent().toISOString();
     const user_id = userId;
@@ -43,11 +125,11 @@ export class Note {
       id,
       title,
       description,
-      category,
+      category ?? faker.helpers.arrayElement(["Work", "Personal", "Home"]),
       completed,
       user_id,
       created_at,
-      updated_at
+      updated_at,
     );
   }
 }
