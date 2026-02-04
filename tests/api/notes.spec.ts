@@ -5,13 +5,31 @@ import { expectSuccessResponse } from "@utils/assertions";
 import { StatusCodes } from "http-status-codes";
 import { API_ENDPOINTS, API_MESSAGES, HTTP_HEADERS } from "@utils/constants";
 
+/**
+ * Notes API test suite
+ * Tests CRUD operations for notes including create, retrieve, update, and delete
+ */
 test.describe("Notes API", () => {
+  /**
+   * Cleanup hook that runs after each test
+   * Deletes the user account if authentication was successful
+   * @param {Object} params - Test parameters
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.deleteUserAccount - Function to delete user account
+   */
   test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser.getToken()) {
       await deleteUserAccount(authenticatedUser);
     }
   });
 
+  /**
+   * Test creating a new note via POST endpoint
+   * Verifies that a note is successfully created with correct response data
+   * @param {Object} params - Test parameters
+   * @param {request} params.request - Playwright request object for making HTTP calls
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("POST /notes", async ({ request, authenticatedUser }) => {
     const note = await Note.createNote(authenticatedUser.getId()!);
     const response = await sendRequest(request, "post", API_ENDPOINTS.NOTES, {
@@ -47,6 +65,14 @@ test.describe("Notes API", () => {
     authenticatedUser.addNote(createdNote);
   });
 
+  /**
+   * Test retrieving a note by ID via GET endpoint
+   * Verifies that a specific note can be retrieved with correct data
+   * @param {Object} params - Test parameters
+   * @param {request} params.request - Playwright request object for making HTTP calls
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("GET /notes/{id}", async ({
     request,
     authenticatedUser,
@@ -81,6 +107,14 @@ test.describe("Notes API", () => {
     );
   });
 
+  /**
+   * Test updating a note via PUT endpoint
+   * Verifies that a note can be completely updated with new data
+   * @param {Object} params - Test parameters
+   * @param {request} params.request - Playwright request object for making HTTP calls
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("PUT /notes/{id}", async ({
     request,
     authenticatedUser,
@@ -128,6 +162,14 @@ test.describe("Notes API", () => {
     );
   });
 
+  /**
+   * Test partially updating a note via PATCH endpoint
+   * Verifies that specific fields of a note can be updated without affecting others
+   * @param {Object} params - Test parameters
+   * @param {request} params.request - Playwright request object for making HTTP calls
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("PATCH /notes/{id}", async ({
     request,
     authenticatedUser,
@@ -168,6 +210,15 @@ test.describe("Notes API", () => {
     );
   });
 
+  /**
+   * Test deleting a note via DELETE endpoint
+   * Verifies that a note can be successfully deleted
+   * @param {Object} params - Test parameters
+   * @param {request} params.request - Playwright request object for making HTTP calls
+   * @param {Object} params.apiContext - API context for making HTTP requests
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("DELETE /notes/{id}", async ({
     request,
     apiContext,

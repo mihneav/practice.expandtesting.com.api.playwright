@@ -17,7 +17,6 @@ export const noteFixtures = {
   ) => {
     const note = await Note.createNote(authenticatedUser.getId());
     await use(note);
-    // Note cleanup handled by deleteUser in afterEach
   },
 
   apiCreatedNote: async (

@@ -1,6 +1,7 @@
 {
   "name": "practice.expandtesting.com.api.playwright",
   "version": "1.0.0",
+  "type": "module",
   "description": "Playwright test suite for practice.expandtesting.com",
   "main": "index.js",
   "scripts": {

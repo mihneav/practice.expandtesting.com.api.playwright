@@ -38,10 +38,8 @@ export default defineConfig({
     {
       name: "API Tests",
       testMatch: ["**/api/*.spec.ts"],
-      use: {
-        screenshot: "off",
-        video: "off",
-      },
+      fullyParallel: true, // ✅ Add this
+      use: { screenshot: "off", video: "off" },
     },
     {
       name: "E2E Tests",

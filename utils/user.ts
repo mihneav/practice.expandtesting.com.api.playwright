@@ -1,5 +1,5 @@
 import { Note } from "./note";
-
+import { faker } from "./faker";
 /**
  * Represents a user in the system with authentication and profile information
  */
@@ -44,8 +44,6 @@ export class User {
    * @returns Promise resolving to a new User instance
    */
   public static async createUser(): Promise<User> {
-    const { faker } = await import("@faker-js/faker");
-
     const firstName = faker.person.firstName().toLowerCase();
     const lastName = faker.person.lastName().toLowerCase();
 

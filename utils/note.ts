@@ -1,3 +1,4 @@
+import { faker } from "./faker";
 export class Note {
   private id: string;
   private title: string;
@@ -151,7 +152,6 @@ export class Note {
     userId: string,
     category?: string,
   ): Promise<Note> {
-    const { faker } = await import("@faker-js/faker");
     const id = "";
     const title = faker.lorem.sentence();
     const description = faker.lorem.paragraph();
@@ -169,6 +169,19 @@ export class Note {
       user_id,
       created_at,
       updated_at,
+    );
+  }
+
+  public clone(): Note {
+    return new Note(
+      this.id,
+      this.title,
+      this.description,
+      this.category,
+      this.completed,
+      this.user_id,
+      this.created_at,
+      this.updated_at,
     );
   }
 }

@@ -1,42 +1,57 @@
 import { test, expect } from "@lib/baseE2eTest";
-import { Note } from "@utils/note";
 import { generateNoteApi } from "@utils/helpers";
 import { API_MESSAGES, NOTE_CATEGORIES } from "@utils/constants";
+import { User } from "@utils/user";
+import { Note } from "@utils/note";
 
-const getLastNote = (authenticatedUser: { getNotes: () => Note[] }): Note => {
-  const notes = authenticatedUser.getNotes();
-  return notes[notes.length - 1];
-};
-
-const cloneNote = (note: Note): Note =>
-  new Note(
-    note.getId(),
-    note.getTitle(),
-    note.getDescription(),
-    note.getCategory(),
-    note.getCompleted(),
-    note.getUserId(),
-    note.getCreatedAt(true),
-    note.getUpdatedAt(),
-  );
-
+/**
+ * Notes test suite
+ * Tests note-related functionality including creating, editing, deleting, filtering, and searching notes
+ */
 test.describe("Notes", () => {
+  /**
+   * Setup hook that runs before each test
+   * Authenticates user by setting the auth token
+   * @param {Object} params - Test parameters
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.setAuthToken - Function to set the authentication token
+   */
   test.beforeEach(async ({ authenticatedUser, setAuthToken }) => {
     await setAuthToken(authenticatedUser.getToken());
   });
 
+  /**
+   * Cleanup hook that runs after each test
+   * Deletes the user account if authentication was successful
+   * @param {Object} params - Test parameters
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.deleteUserAccount - Function to delete user account
+   */
   test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser.getToken()) {
       await deleteUserAccount(authenticatedUser);
     }
   });
 
+  /**
+   * Test adding a new note
+   * Verifies that a new note can be successfully created and displayed
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {Note} params.note - Test note object
+   */
   test("Add New Note", async ({ notesPage, note }) => {
     await notesPage.gotoNotes();
     await notesPage.addNewNote(note);
     await notesPage.verifyNote(note);
   });
 
+  /**
+   * Test add note form validation
+   * Verifies that validation errors are displayed when required note fields are missing
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   */
   test("Add Note Validation", async ({ notesPage }) => {
     await notesPage.gotoNotes();
     await notesPage.openAddNoteModal();
@@ -47,8 +62,15 @@ test.describe("Notes", () => {
     ]);
   });
 
+  /**
+   * Test editing an existing note
+   * Verifies that note details can be successfully updated
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("Edit Note", async ({ notesPage, apiCreatedNote }) => {
-    const updatedNote = cloneNote(apiCreatedNote);
+    const updatedNote = apiCreatedNote.clone();
     await notesPage.gotoNotes();
     updatedNote.setCategory(NOTE_CATEGORIES.WORK);
     updatedNote.setTitle("Updated " + apiCreatedNote.getTitle());
@@ -59,12 +81,27 @@ test.describe("Notes", () => {
     await notesPage.verifyNote(updatedNote);
   });
 
+  /**
+   * Test deleting a note
+   * Verifies that a note can be successfully deleted and is no longer visible
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("Delete Note", async ({ notesPage, apiCreatedNote }) => {
     await notesPage.gotoNotes();
     await notesPage.deleteNote(apiCreatedNote);
     await notesPage.verifyNoteDeleted(apiCreatedNote);
   });
 
+  /**
+   * Test note category filtering
+   * Verifies that notes can be filtered and displayed by their assigned category
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {APIRequestContext} params.apiContext - API context for making HTTP requests
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("Verify Note Categories", async ({
     notesPage,
     apiContext,
@@ -75,9 +112,11 @@ test.describe("Notes", () => {
       NOTE_CATEGORIES.WORK,
       NOTE_CATEGORIES.PERSONAL,
     ];
-    for (const category of categories) {
-      await generateNoteApi(apiContext, authenticatedUser, category);
-    }
+    await Promise.all(
+      categories.map((cat) =>
+        generateNoteApi(apiContext, authenticatedUser, cat),
+      ),
+    );
 
     await notesPage.gotoNotes();
 
@@ -87,15 +126,25 @@ test.describe("Notes", () => {
     }
   });
 
+  /**
+   * Test searching notes by title
+   * Verifies that notes can be found using the search functionality
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {APIRequestContext} params.apiContext - API context for making HTTP requests
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("Search Notes", async ({ notesPage, apiContext, authenticatedUser }) => {
     const categories = [
       NOTE_CATEGORIES.HOME,
       NOTE_CATEGORIES.WORK,
       NOTE_CATEGORIES.PERSONAL,
     ];
-    for (const category of categories) {
-      await generateNoteApi(apiContext, authenticatedUser, category);
-    }
+    await Promise.all(
+      categories.map((cat) =>
+        generateNoteApi(apiContext, authenticatedUser, cat),
+      ),
+    );
     await notesPage.gotoNotes();
 
     for (const note of authenticatedUser.getNotes()) {
@@ -104,14 +153,28 @@ test.describe("Notes", () => {
     }
   });
 
+  /**
+   * Test note details view
+   * Verifies that detailed information for a note is correctly displayed
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {Note} params.apiCreatedNote - Note created via API
+   */
   test("Note Details View", async ({ notesPage, apiCreatedNote }) => {
     await notesPage.gotoNotes();
     await notesPage.openNoteDetails(apiCreatedNote);
     await notesPage.verifyNoteDetails(apiCreatedNote);
   });
 
-  // Note: This test simulates a large number of notes to test pagination behavior.
-  // Actual pagination controls are not implemented in the UI.
+  /**
+   * Test pagination functionality
+   * Verifies that a large number of notes can be displayed with pagination
+   * Note: This test simulates a large number of notes to test pagination behavior.
+   * Actual pagination controls are not implemented in the UI.
+   * @param {Object} params - Test parameters
+   * @param {NotesPage} params.notesPage - Notes page object
+   * @param {Function} params.mockManyNotes - Function to mock many notes
+   */
   test("Pagination", async ({ notesPage, mockManyNotes }) => {
     await mockManyNotes(100);
     await notesPage.gotoNotes();

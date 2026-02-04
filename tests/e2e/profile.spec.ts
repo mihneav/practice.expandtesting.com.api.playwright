@@ -1,18 +1,41 @@
 import { expect, test } from "@lib/baseE2eTest";
-import { loginUser } from "@lib/fixtures/userFixtures";
-import { Note } from "@utils/note";
 
+/**
+ * Profile test suite
+ * Tests profile-related functionality including profile fields, logout, profile updates, and password changes
+ */
 test.describe("Profile", () => {
+  /**
+   * Setup hook that runs before each test
+   * Authenticates user by setting the auth token
+   * @param {Object} params - Test parameters
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.setAuthToken - Function to set the authentication token
+   */
   test.beforeEach(async ({ authenticatedUser, setAuthToken }) => {
     await setAuthToken(authenticatedUser.getToken());
   });
 
+  /**
+   * Cleanup hook that runs after each test
+   * Deletes the user account if authentication was successful
+   * @param {Object} params - Test parameters
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.deleteUserAccount - Function to delete user account
+   */
   test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser?.getToken?.()) {
       await deleteUserAccount(authenticatedUser);
     }
   });
 
+  /**
+   * Test that verifies profile page displays correct user information
+   * Validates that user ID, full name, and email are correctly displayed
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("Check Profile fields", async ({ profilePage, authenticatedUser }) => {
     await profilePage.gotoProfile();
     await expect(profilePage.userIdInput).toHaveValue(
@@ -26,12 +49,26 @@ test.describe("Profile", () => {
     );
   });
 
+  /**
+   * Test logout functionality
+   * Verifies that user is successfully logged out and logout button is no longer visible
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   * @param {Function} params.clearAuthToken - Function to clear the authentication token
+   */
   test("Logout", async ({ profilePage, clearAuthToken }) => {
     await profilePage.gotoProfile();
     await profilePage.logout(clearAuthToken);
     await expect(profilePage.logoutButton).not.toBeVisible();
   });
 
+  /**
+   * Test profile update form validation
+   * Verifies that validation errors are displayed for invalid profile update submissions
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("Profile Update Validation", async ({
     profilePage,
     authenticatedUser,
@@ -51,6 +88,13 @@ test.describe("Profile", () => {
     }
   });
 
+  /**
+   * Test successful profile update
+   * Verifies that user profile information can be successfully updated
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   * @param {User} params.authenticatedUser - The authenticated user object
+   */
   test("Profile Update", async ({ profilePage, authenticatedUser }) => {
     await profilePage.gotoProfile();
 
@@ -66,6 +110,12 @@ test.describe("Profile", () => {
     await expect(profilePage.phoneInput).toHaveValue(newPhone);
   });
 
+  /**
+   * Test change password form validation
+   * Verifies that validation errors are displayed when attempting to change password with missing required fields
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   */
   test("Change Password Validation", async ({ profilePage }) => {
     await profilePage.gotoProfile();
     await profilePage.changePasswordTab.click();
@@ -82,6 +132,15 @@ test.describe("Profile", () => {
     }
   });
 
+  /**
+   * Test successful password change
+   * Verifies that user can successfully change their password and login with the new password
+   * @param {Object} params - Test parameters
+   * @param {ProfilePage} params.profilePage - Profile page object
+   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {LoginPage} params.loginPage - Login page object
+   * @param {Function} params.clearAuthToken - Function to clear the authentication token
+   */
   test("Change Password", async ({
     profilePage,
     authenticatedUser,

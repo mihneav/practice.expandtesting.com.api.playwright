@@ -35,11 +35,11 @@ export function getMethod(httpMethod: string) {
  * const response = await sendRequest(request, "get", "/api/notes");
  */
 export async function sendRequest(
-  request: any,
-  method: string,
+  request: APIRequestContext,
+  method: "get" | "post" | "put" | "patch" | "delete",
   endpoint: string,
-  options?: any,
-) {
+  options?: { headers?: Record<string, string>; data?: any },
+): Promise<APIResponse> {
   return request[method](endpoint, options);
 }
 

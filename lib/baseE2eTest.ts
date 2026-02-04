@@ -2,9 +2,9 @@ import {
   test as baseTest,
   expect,
   request,
-  BrowserContext,
-  APIRequestContext,
-  APIResponse,
+  type BrowserContext,
+  type APIRequestContext,
+  type APIResponse,
 } from "@playwright/test";
 import { pageFixtures, PageFixtures } from "@fixtures/pageFixtures";
 import { apiFixtures, ApiFixtures } from "@fixtures/apiFixtures";
@@ -34,8 +34,8 @@ export const test = baseTest.extend<BaseFixtures>({
   },
 });
 
-export { BrowserContext };
-export { APIRequestContext };
-export { APIResponse };
+export type { BrowserContext };
+export type { APIRequestContext };
+export type { APIResponse };
 export { expect };
 export { request };
