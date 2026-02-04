@@ -8,12 +8,21 @@ import { Note } from "@utils/note";
 import { API_BASE_URL, HTTP_HEADERS } from "@utils/constants";
 import { sendRequest } from "@utils/helpers";
 
+/**
+ * API Fixtures type definition
+ * Includes API request context and utility functions for user and note management
+ */
 export type ApiFixtures = {
   apiContext: APIRequestContext;
   deleteUserAccount: (user: User) => Promise<APIResponse>;
   deleteNoteById: (user: User, note: Note) => Promise<APIResponse>;
 };
 
+/**
+ * API Fixtures implementation
+ * Provides setup and teardown for API tests
+ * Includes functions to delete user accounts and notes via API
+ */
 export const apiFixtures = {
   apiContext: async ({}, use: (r: APIRequestContext) => Promise<void>) => {
     const context = await playwrightRequest.newContext({
@@ -23,6 +32,12 @@ export const apiFixtures = {
     await context.dispose();
   },
 
+  /**
+   * Deletes a user account via API
+   *
+   * @param {User} user - User object containing authentication token
+   * @returns {APIResponse} API response from delete account request
+   */
   deleteUserAccount: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: (user: User) => Promise<APIResponse>) => Promise<void>,
@@ -46,6 +61,12 @@ export const apiFixtures = {
     await use(deleteUserFn);
   },
 
+  /**
+   * Deletes a note by ID via API
+   * @param {User} user - User object containing authentication token
+   * @param {Note} note - Note object to be deleted
+   * @returns {APIResponse} API response from delete note request
+   */
   deleteNoteById: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: (user: User, note: Note) => Promise<APIResponse>) => Promise<void>,

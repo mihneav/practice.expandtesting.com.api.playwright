@@ -1,6 +1,6 @@
 import { test, expect } from "@lib/baseE2eTest";
 import { Note } from "@utils/note";
-import { deleteNoteApi, sendRequest, getMethod } from "@utils/helpers";
+import { sendRequest } from "@utils/helpers";
 import { expectSuccessResponse } from "@utils/assertions";
 import { StatusCodes } from "http-status-codes";
 import { API_ENDPOINTS, API_MESSAGES, HTTP_HEADERS } from "@utils/constants";
@@ -78,7 +78,7 @@ test.describe("Notes API", () => {
     authenticatedUser,
     apiCreatedNote,
   }) => {
-    const note = authenticatedUser.getNotes()[0];
+    const note = await apiCreatedNote();
     const response = await sendRequest(
       request,
       "get",
@@ -120,7 +120,7 @@ test.describe("Notes API", () => {
     authenticatedUser,
     apiCreatedNote,
   }) => {
-    const note = authenticatedUser.getNotes()[0];
+    const note = await apiCreatedNote();
     const response = await sendRequest(
       request,
       "put",
@@ -175,7 +175,7 @@ test.describe("Notes API", () => {
     authenticatedUser,
     apiCreatedNote,
   }) => {
-    const note = authenticatedUser.getNotes()[0];
+    const note = await apiCreatedNote();
     const response = await sendRequest(
       request,
       "patch",
@@ -214,23 +214,19 @@ test.describe("Notes API", () => {
    * Test deleting a note via DELETE endpoint
    * Verifies that a note can be successfully deleted
    * @param {Object} params - Test parameters
-   * @param {request} params.request - Playwright request object for making HTTP calls
-   * @param {Object} params.apiContext - API context for making HTTP requests
    * @param {User} params.authenticatedUser - The authenticated user object
    * @param {Note} params.apiCreatedNote - Note created via API
+   * @param {Function} params.deleteNoteById - Function to delete note by ID
    */
   test("DELETE /notes/{id}", async ({
-    request,
-    apiContext,
     authenticatedUser,
     apiCreatedNote,
+    deleteNoteById,
   }) => {
-    const response = await deleteNoteApi(
-      apiContext,
+    const response = await deleteNoteById(
       authenticatedUser,
-      authenticatedUser.getNotes()[0],
+      await apiCreatedNote(),
     );
-
     const body = await response.json();
 
     await expectSuccessResponse(response);

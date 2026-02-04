@@ -1,10 +1,19 @@
 import { Page } from "@playwright/test";
 
+/**
+ * Auth Fixtures type definition
+ * Includes functions to set and clear authentication tokens in local storage
+ */
 export type AuthFixtures = {
   setAuthToken: (token: string) => Promise<void>; // ✅ Keep
   clearAuthToken: () => Promise<void>; // ✅ Rename from unsetAuthToken
 };
 
+/**
+ * Auth Fixtures implementation
+ * Provides functions to set and clear authentication tokens in local storage
+ * Used for simulating authenticated and unauthenticated states in tests
+ */
 export const authFixtures = {
   setAuthToken: async (
     { page }: { page: Page },

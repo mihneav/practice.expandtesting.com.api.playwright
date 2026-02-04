@@ -76,6 +76,9 @@ export class NotesPage {
   }
 
   async verifyNote(note: Note): Promise<void> {
+    await expect(async () => {
+      this.noteCardTitle.filter({ hasText: note.getTitle() }).isVisible();
+    }).toPass();
     await expect(
       this.noteCardTitle.filter({ hasText: note.getTitle() }),
     ).toHaveText(note.getTitle());

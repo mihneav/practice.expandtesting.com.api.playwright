@@ -1,7 +1,7 @@
 import { test } from "@lib/baseE2eTest";
 import { StatusCodes } from "http-status-codes";
 import { expectSuccessResponse } from "@utils/assertions";
-import { API_ENDPOINTS } from "@utils/constants";
+import { API_ENDPOINTS, API_MESSAGES } from "@utils/constants";
 import { sendRequest } from "@utils/helpers";
 
 /**
@@ -22,7 +22,7 @@ test.describe("Health Check API", () => {
       response,
       undefined,
       StatusCodes.OK,
-      "Notes API is Running",
+      API_MESSAGES.HEALTH_CHECK_OK,
     );
   });
 });

@@ -3,12 +3,21 @@ import { User } from "@utils/user";
 import { StatusCodes } from "http-status-codes";
 import { sendRequest } from "@utils/helpers";
 
+/**
+ * User Fixtures type definition
+ * Includes a generic user, an authenticated user, and a registered user
+ */
 export type UserFixtures = {
   user: User;
   authenticatedUser: User;
   registeredUser: User;
 };
 
+/**
+ * Registers a user via API
+ * @param {APIRequestContext} apiContext - Playwright API request context
+ * @param {User} user - User object to register
+ */
 const registerUser = async (
   apiContext: APIRequestContext,
   user: User,
@@ -42,6 +51,11 @@ const registerUser = async (
   }
 };
 
+/**
+ * Logs in a user via API and sets the authentication token
+ * @param {APIRequestContext} apiContext - Playwright API request context
+ * @param {User} user - User object to log in
+ */
 export const loginUser = async (
   apiContext: APIRequestContext,
   user: User,
@@ -63,12 +77,19 @@ export const loginUser = async (
   user.setToken(loginBody.data.token);
 };
 
+/**
+ * User Fixtures implementation
+ * Provides a generic user, an authenticated user, and a registered user
+ */
 export const userFixtures = {
   user: async ({}, use: (r: User) => Promise<void>) => {
     const user = await User.createUser();
     await use(user);
   },
 
+  /**
+   * Provides an authenticated user fixture
+   */
   authenticatedUser: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: User) => Promise<void>,
@@ -81,6 +102,9 @@ export const userFixtures = {
     await use(user);
   },
 
+  /**
+   * Provides a registered user fixture
+   */
   registeredUser: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: User) => Promise<void>,

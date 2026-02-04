@@ -1,4 +1,5 @@
 import { expect, test } from "@lib/baseE2eTest";
+import { UI_MESSAGES } from "@utils/constants";
 
 /**
  * Profile test suite
@@ -79,8 +80,8 @@ test.describe("Profile", () => {
     await profilePage.page.getByTestId("update-profile").click();
 
     const validationErrors = [
-      "User name is required",
-      "Phone number should be between 8 and 20 digits",
+      UI_MESSAGES.PROFILE_USER_NAME_REQUIRED,
+      UI_MESSAGES.PROFILE_PHONE_NUMBER_LENGTH,
     ];
 
     for (const [index, error] of validationErrors.entries()) {
@@ -122,9 +123,9 @@ test.describe("Profile", () => {
 
     await profilePage.updatePasswordButton.click();
     const validationErrors = [
-      "Current password is required",
-      "New password is required",
-      "Confirm password is required",
+      UI_MESSAGES.PROFILE_CURRENT_PASSWORD_REQUIRED,
+      UI_MESSAGES.PROFILE_NEW_PASSWORD_REQUIRED,
+      UI_MESSAGES.PROFILE_CONFIRM_PASSWORD_REQUIRED,
     ];
 
     for (const [index, error] of validationErrors.entries()) {

@@ -22,6 +22,9 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const API_MESSAGES = {
+  // Health messages
+  HEALTH_CHECK_OK: "Notes API is Running",
+
   // User messages
   USER_CREATED: "User account created successfully",
   LOGIN_SUCCESSFUL: "Login successful",
@@ -49,6 +52,14 @@ export const API_MESSAGES = {
   TITLE_REQUIRED: "Title is required",
   DESCRIPTION_REQUIRED: "Description is required",
 } as const;
+
+export const UI_MESSAGES = {
+  PROFILE_USER_NAME_REQUIRED: "User name is required",
+  PROFILE_PHONE_NUMBER_LENGTH: "Phone number should be between 8 and 20 digits",
+  PROFILE_CURRENT_PASSWORD_REQUIRED: "Current password is required",
+  PROFILE_NEW_PASSWORD_REQUIRED: "New password is required",
+  PROFILE_CONFIRM_PASSWORD_REQUIRED: "Confirm password is required",
+};
 
 export const TEST_CONFIG = {
   ID_LENGTH: 24,

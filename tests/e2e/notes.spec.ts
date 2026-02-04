@@ -1,8 +1,5 @@
 import { test, expect } from "@lib/baseE2eTest";
-import { generateNoteApi } from "@utils/helpers";
 import { API_MESSAGES, NOTE_CATEGORIES } from "@utils/constants";
-import { User } from "@utils/user";
-import { Note } from "@utils/note";
 
 /**
  * Notes test suite
@@ -70,14 +67,15 @@ test.describe("Notes", () => {
    * @param {Note} params.apiCreatedNote - Note created via API
    */
   test("Edit Note", async ({ notesPage, apiCreatedNote }) => {
-    const updatedNote = apiCreatedNote.clone();
+    const note = await apiCreatedNote();
+    const updatedNote = note.clone();
     await notesPage.gotoNotes();
     updatedNote.setCategory(NOTE_CATEGORIES.WORK);
-    updatedNote.setTitle("Updated " + apiCreatedNote.getTitle());
-    updatedNote.setDescription("Updated " + apiCreatedNote.getDescription());
+    updatedNote.setTitle("Updated " + note.getTitle());
+    updatedNote.setDescription("Updated " + note.getDescription());
     updatedNote.setCompleted(true);
 
-    await notesPage.editNote(apiCreatedNote, updatedNote);
+    await notesPage.editNote(note, updatedNote);
     await notesPage.verifyNote(updatedNote);
   });
 
@@ -89,9 +87,10 @@ test.describe("Notes", () => {
    * @param {Note} params.apiCreatedNote - Note created via API
    */
   test("Delete Note", async ({ notesPage, apiCreatedNote }) => {
+    const noteToDelete = await apiCreatedNote();
     await notesPage.gotoNotes();
-    await notesPage.deleteNote(apiCreatedNote);
-    await notesPage.verifyNoteDeleted(apiCreatedNote);
+    await notesPage.deleteNote(noteToDelete);
+    await notesPage.verifyNoteDeleted(noteToDelete);
   });
 
   /**
@@ -99,28 +98,24 @@ test.describe("Notes", () => {
    * Verifies that notes can be filtered and displayed by their assigned category
    * @param {Object} params - Test parameters
    * @param {NotesPage} params.notesPage - Notes page object
-   * @param {APIRequestContext} params.apiContext - API context for making HTTP requests
-   * @param {User} params.authenticatedUser - The authenticated user object
+   * @param {Function} params.apiCreatedNote - Fixture to create a note via API
    */
   test("Verify Note Categories", async ({
     notesPage,
-    apiContext,
     authenticatedUser,
+    apiCreatedNote,
   }) => {
     const categories = [
       NOTE_CATEGORIES.HOME,
       NOTE_CATEGORIES.WORK,
       NOTE_CATEGORIES.PERSONAL,
     ];
-    await Promise.all(
-      categories.map((cat) =>
-        generateNoteApi(apiContext, authenticatedUser, cat),
-      ),
-    );
+    await Promise.all(categories.map((cat) => apiCreatedNote(cat)));
 
+    const notes = authenticatedUser.getNotes();
     await notesPage.gotoNotes();
 
-    for (const note of authenticatedUser.getNotes()) {
+    for (const note of notes) {
       await notesPage.filterByCategory(note.getCategory());
       await notesPage.verifyNote(note);
     }
@@ -134,17 +129,18 @@ test.describe("Notes", () => {
    * @param {APIRequestContext} params.apiContext - API context for making HTTP requests
    * @param {User} params.authenticatedUser - The authenticated user object
    */
-  test("Search Notes", async ({ notesPage, apiContext, authenticatedUser }) => {
+  test("Search Notes", async ({
+    notesPage,
+    apiContext,
+    authenticatedUser,
+    apiCreatedNote,
+  }) => {
     const categories = [
       NOTE_CATEGORIES.HOME,
       NOTE_CATEGORIES.WORK,
       NOTE_CATEGORIES.PERSONAL,
     ];
-    await Promise.all(
-      categories.map((cat) =>
-        generateNoteApi(apiContext, authenticatedUser, cat),
-      ),
-    );
+    await Promise.all(categories.map((cat) => apiCreatedNote(cat)));
     await notesPage.gotoNotes();
 
     for (const note of authenticatedUser.getNotes()) {
@@ -161,9 +157,10 @@ test.describe("Notes", () => {
    * @param {Note} params.apiCreatedNote - Note created via API
    */
   test("Note Details View", async ({ notesPage, apiCreatedNote }) => {
+    const note = await apiCreatedNote();
     await notesPage.gotoNotes();
-    await notesPage.openNoteDetails(apiCreatedNote);
-    await notesPage.verifyNoteDetails(apiCreatedNote);
+    await notesPage.openNoteDetails(note);
+    await notesPage.verifyNoteDetails(note);
   });
 
   /**

@@ -1,7 +1,10 @@
 import { Page } from "@playwright/test";
 
 export async function setupPageEnhancements(page: Page): Promise<void> {
-  // Add script to remove ads
+  /**
+   * Ad blocking script
+   * Removes common ad elements from the page to enhance test reliability
+   */
   await page.addInitScript(() => {
     const removeAds = () => {
       const adSelectors = [
@@ -102,7 +105,10 @@ export async function setupPageEnhancements(page: Page): Promise<void> {
     }
   });
 
-  // Auto-scroll on click
+  /**
+   * Enhanced locator click
+   * Overrides the default locator click to ensure the element is scrolled into view before clicking
+   */
   const originalLocator = page.locator.bind(page);
   page.locator = function (selector: string, options?: any) {
     const loc = originalLocator(selector, options);
