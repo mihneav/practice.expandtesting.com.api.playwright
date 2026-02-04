@@ -2,11 +2,13 @@ import { Page } from "@playwright/test";
 import { LoginPage } from "@pages/loginPage";
 import { RegisterPage } from "@pages/registerPage";
 import { NotesPage } from "@pages/notesPage";
+import { ProfilePage } from "@pages/profilePage";
 
 export type PageFixtures = {
   loginPage: LoginPage;
   registerPage: RegisterPage;
   notesPage: NotesPage;
+  profilePage: ProfilePage;
 };
 
 export const pageFixtures = {
@@ -29,5 +31,12 @@ export const pageFixtures = {
     use: (r: NotesPage) => Promise<void>,
   ) => {
     await use(new NotesPage(page));
+  },
+
+  profilePage: async (
+    { page }: { page: Page },
+    use: (r: ProfilePage) => Promise<void>,
+  ) => {
+    await use(new ProfilePage(page));
   },
 };

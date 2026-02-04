@@ -20,9 +20,9 @@ const invalidLoginData = [
 ];
 
 test.describe("Login", () => {
-  test.afterEach(async ({ authenticatedUser, deleteUser }) => {
+  test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser?.getToken?.()) {
-      await deleteUser(authenticatedUser);
+      await deleteUserAccount(authenticatedUser);
     }
   });
 
@@ -36,15 +36,16 @@ test.describe("Login", () => {
     await loginPage.expectHomeVisible();
   });
 
-  test("Login with invalid credentials", async ({ loginPage }) => {
+  test("Login with invalid credentials", async ({
+    loginPage,
+    authenticatedUser,
+  }) => {
     await loginPage.gotoLogin();
     await loginPage.login("invalid@example.com", "wrongpassword");
     await loginPage.expectLoginError();
   });
 
-  test(`should show validation errors for email and password`, async ({
-    loginPage,
-  }) => {
+  test(`Verify invalid login validation errors`, async ({ loginPage }) => {
     await loginPage.gotoLogin();
     for (const data of invalidLoginData) {
       await loginPage.login(data.email, data.password);

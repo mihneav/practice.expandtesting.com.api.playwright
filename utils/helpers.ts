@@ -107,3 +107,26 @@ export async function deleteNoteApi(
 
   return response;
 }
+/**
+ * Logs in a user via API
+ *
+ * @param apiContext - Playwright API request context
+ * @param user - User object with email and password
+ * @returns API response from user login request
+ *
+ * @example
+ * const response = await loginUserApi(apiContext, user);
+ */
+export async function loginUserApi(
+  apiContext: APIRequestContext,
+  user: User,
+): Promise<APIResponse> {
+  const response = await apiContext.post("users/login", {
+    data: {
+      email: user.getEmail(),
+      password: user.getPassword(),
+    },
+  });
+
+  return response;
+}

@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 
-//Load environment variables from .env file
-dotenv.config();
+// //Load environment variables from .env file
+// dotenv.config();
 
 export default defineConfig({
   testDir: "./tests/",
@@ -14,14 +14,16 @@ export default defineConfig({
   reporter: [["html"], ["list"]],
 
   // Increased timeout for API tests with potential network latency
-  timeout: 30 * 1000,
+  timeout: 10000,
 
   expect: {
-    timeout: 10000,
+    timeout: 5000,
   },
 
   use: {
     baseURL: process.env.BASE_URL || "https://practice.expandtesting.com/",
+    navigationTimeout: 10000,
+    actionTimeout: 10000,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",

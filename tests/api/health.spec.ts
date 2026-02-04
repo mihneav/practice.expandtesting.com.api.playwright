@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "@utils/constants";
 import { sendRequest } from "@utils/helpers";
 
 test.describe("Health Check API", () => {
-  test("should return successful health status", async ({ request }) => {
+  test("Health Status", async ({ request }) => {
     const response = await sendRequest(
       request,
       "get",

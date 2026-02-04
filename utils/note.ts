@@ -53,12 +53,51 @@ export class Note {
     return this.user_id;
   }
 
-  public getCreatedAt(): string | undefined {
-    return this.created_at;
+  public getCreatedAt(formatted?: boolean): string | undefined {
+    if (!formatted) {
+      return this.created_at;
+    }
+    return Note.formatDateString(this.created_at);
   }
 
-  public getUpdatedAt(): string | undefined {
-    return this.updated_at;
+  public getUpdatedAt(formatted?: boolean): string | undefined {
+    if (!formatted) {
+      return this.updated_at;
+    }
+    return Note.formatDateString(this.updated_at);
+  }
+
+  private static formatDateString(dateStr?: string): string | undefined {
+    if (!dateStr) return undefined;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return undefined;
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // Use UTC getters to consider timezone GMT+0
+    const month = monthNames[d.getUTCMonth()];
+    const pad = (n: number) => n.toString().padStart(2, "0");
+
+    const day = d.getUTCDate().toString();
+    const year = d.getUTCFullYear();
+    const hours = pad(d.getUTCHours());
+    const minutes = pad(d.getUTCMinutes());
+    const seconds = pad(d.getUTCSeconds());
+
+    return `${month} ${day}, ${year} at ${hours}:${minutes}:${seconds}`;
   }
 
   // Setters for mutable properties used in tests

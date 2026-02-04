@@ -1,9 +1,9 @@
 import { test } from "@lib/baseE2eTest";
 
 test.describe("Register", () => {
-  test.afterEach(async ({ authenticatedUser, deleteUser }) => {
+  test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser?.getToken?.()) {
-      await deleteUser(authenticatedUser);
+      await deleteUserAccount(authenticatedUser);
     }
   });
 

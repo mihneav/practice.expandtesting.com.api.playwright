@@ -1,4 +1,4 @@
-import { test } from "@lib/baseE2eTest";
+import { test, expect } from "@lib/baseE2eTest";
 import { Note } from "@utils/note";
 import { generateNoteApi } from "@utils/helpers";
 import { API_MESSAGES, NOTE_CATEGORIES } from "@utils/constants";
@@ -16,7 +16,7 @@ const cloneNote = (note: Note): Note =>
     note.getCategory(),
     note.getCompleted(),
     note.getUserId(),
-    note.getCreatedAt(),
+    note.getCreatedAt(true),
     note.getUpdatedAt(),
   );
 
@@ -25,18 +25,16 @@ test.describe("Notes", () => {
     await setAuthToken(authenticatedUser.getToken());
   });
 
-  test.afterEach(async ({ authenticatedUser, deleteUser }) => {
+  test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser.getToken()) {
-      await deleteUser(authenticatedUser);
+      await deleteUserAccount(authenticatedUser);
     }
   });
 
-  test("Add New Note", async ({ notesPage, authenticatedUser }) => {
+  test("Add New Note", async ({ notesPage, note }) => {
     await notesPage.gotoNotes();
-    const note = await Note.createNote(authenticatedUser.getId());
     await notesPage.addNewNote(note);
-    await notesPage.verifyNoteAdded(note);
-    await notesPage.deleteNote(note);
+    await notesPage.verifyNote(note);
   });
 
   test("Add Note Validation", async ({ notesPage }) => {
@@ -49,28 +47,22 @@ test.describe("Notes", () => {
     ]);
   });
 
-  test("Edit Note", async ({ notesPage, authenticatedUser, generateNote }) => {
-    const note = getLastNote(authenticatedUser);
-    const updatedNote = cloneNote(note);
+  test("Edit Note", async ({ notesPage, apiCreatedNote }) => {
+    const updatedNote = cloneNote(apiCreatedNote);
     await notesPage.gotoNotes();
     updatedNote.setCategory(NOTE_CATEGORIES.WORK);
-    updatedNote.setTitle("Updated " + note.getTitle());
-    updatedNote.setDescription("Updated " + note.getDescription());
+    updatedNote.setTitle("Updated " + apiCreatedNote.getTitle());
+    updatedNote.setDescription("Updated " + apiCreatedNote.getDescription());
     updatedNote.setCompleted(true);
 
-    await notesPage.editNote(note, updatedNote);
-    await notesPage.verifyNoteAdded(updatedNote);
+    await notesPage.editNote(apiCreatedNote, updatedNote);
+    await notesPage.verifyNote(updatedNote);
   });
 
-  test("Delete Note", async ({
-    notesPage,
-    authenticatedUser,
-    generateNote,
-  }) => {
-    const note = getLastNote(authenticatedUser);
+  test("Delete Note", async ({ notesPage, apiCreatedNote }) => {
     await notesPage.gotoNotes();
-    await notesPage.deleteNote(note);
-    await notesPage.verifyNoteDeleted(note);
+    await notesPage.deleteNote(apiCreatedNote);
+    await notesPage.verifyNoteDeleted(apiCreatedNote);
   });
 
   test("Verify Note Categories", async ({
@@ -91,7 +83,7 @@ test.describe("Notes", () => {
 
     for (const note of authenticatedUser.getNotes()) {
       await notesPage.filterByCategory(note.getCategory());
-      await notesPage.verifyNoteAdded(note);
+      await notesPage.verifyNote(note);
     }
   });
 
@@ -108,7 +100,21 @@ test.describe("Notes", () => {
 
     for (const note of authenticatedUser.getNotes()) {
       await notesPage.searchNoteByTitle(note.getTitle());
-      await notesPage.verifyNoteAdded(note);
+      await notesPage.verifyNote(note);
     }
+  });
+
+  test("Note Details View", async ({ notesPage, apiCreatedNote }) => {
+    await notesPage.gotoNotes();
+    await notesPage.openNoteDetails(apiCreatedNote);
+    await notesPage.verifyNoteDetails(apiCreatedNote);
+  });
+
+  // Note: This test simulates a large number of notes to test pagination behavior.
+  // Actual pagination controls are not implemented in the UI.
+  test("Pagination", async ({ notesPage, mockManyNotes }) => {
+    await mockManyNotes(100);
+    await notesPage.gotoNotes();
+    await expect(notesPage.noteCard).toHaveCount(100);
   });
 });

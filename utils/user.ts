@@ -7,7 +7,7 @@ export class User {
   private readonly firstName: string;
   private readonly lastName: string;
   private readonly email: string;
-  private readonly password: string;
+  private password: string;
   private phone: string;
   private company: string;
   private username: string;
@@ -85,6 +85,9 @@ export class User {
     return this.email;
   }
 
+  public setPassword(password: string): void {
+    this.password = password;
+  }
   public getPassword(): string {
     return this.password;
   }
@@ -112,6 +115,10 @@ export class User {
   // Setters for mutable properties
   public setToken(token: string): void {
     this.token = token;
+  }
+
+  public clearAuthToken(): void {
+    this.token = "";
   }
 
   public setId(id: string): void {

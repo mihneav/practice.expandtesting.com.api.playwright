@@ -12,7 +12,7 @@
       "@pages/*":["pageRepository/*"],
       "@utils/*":["utils/*"],
       "@lib/*":["lib/*"],
-      "@fixtures/*" :["tests/fixtures/*"]
+      "@fixtures/*" :["lib/fixtures/*"]
     }   
   },
   

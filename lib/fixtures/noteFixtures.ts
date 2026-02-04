@@ -1,12 +1,13 @@
-import { APIRequestContext } from "@playwright/test";
+import { APIRequestContext, Page } from "@playwright/test";
 import { User } from "@utils/user";
 import { Note } from "@utils/note";
-import { HTTP_HEADERS } from "@utils/constants";
+import { HTTP_HEADERS, API_MESSAGES } from "@utils/constants";
 import { sendRequest } from "@utils/helpers";
 
 export type NoteFixtures = {
   note: Note;
-  generateNote: Note;
+  apiCreatedNote: Note;
+  mockManyNotes: (count: number) => Promise<void>;
 };
 
 export const noteFixtures = {
@@ -19,14 +20,17 @@ export const noteFixtures = {
     // Note cleanup handled by deleteUser in afterEach
   },
 
-  generateNote: async (
+  apiCreatedNote: async (
     {
       apiContext,
       authenticatedUser,
-    }: { apiContext: APIRequestContext; authenticatedUser: User },
+    }: {
+      apiContext: APIRequestContext;
+      authenticatedUser: User;
+    },
     use: (r: Note) => Promise<void>,
   ) => {
-    const note = await Note.createNote(authenticatedUser.getId(), "Home");
+    const note = await Note.createNote("Home");
 
     const response = await sendRequest(apiContext, "post", "notes/", {
       headers: {
@@ -57,5 +61,32 @@ export const noteFixtures = {
       // Note may have been deleted during test, ignore error
       console.log(`Note cleanup skipped: ${error}`);
     }
+  },
+
+  mockManyNotes: async (
+    { page, authenticatedUser }: { page: Page; authenticatedUser: User },
+    use: (r: (count: number) => Promise<void>) => Promise<void>,
+  ) => {
+    const mockNotes = async (count: number): Promise<void> => {
+      await page.route("**/api/notes", async (route) => {
+        const notes: Note[] = [];
+        const notePromises = Array.from({ length: count }, () =>
+          Note.createNote(authenticatedUser.getId()),
+        );
+        const createdNotes = await Promise.all(notePromises);
+        notes.push(...createdNotes);
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: true,
+            status: 200,
+            message: API_MESSAGES.NOTE_RETRIEVED,
+            data: notes,
+          }),
+        });
+      });
+    };
+    await use(mockNotes);
   },
 };

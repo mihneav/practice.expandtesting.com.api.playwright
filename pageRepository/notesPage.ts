@@ -1,6 +1,7 @@
 import { Page, Locator, expect } from "@playwright/test";
 import { Note } from "@utils/note";
-import { NOTE_CATEGORIES } from "@utils/constants";
+import { API_MESSAGES, NOTE_CATEGORIES } from "@utils/constants";
+import { User } from "@utils/user";
 
 export class NotesPage {
   readonly page: Page;
@@ -69,40 +70,31 @@ export class NotesPage {
 
   async addNewNote(note: Note): Promise<void> {
     await this.openAddNoteModal();
-    await this.categoryDropdown.selectOption(note.getCategory());
-    if (note.getCompleted()) {
-      await this.completedCheckbox.check();
-    } else {
-      await this.completedCheckbox.uncheck();
-    }
-    await this.titleInput.fill(note.getTitle());
-    await this.descriptionInput.fill(note.getDescription());
+    await this.fillNoteForm(note);
     await this.createButton.click();
     await expect(this.createButton).not.toBeVisible();
   }
 
-  async verifyNoteAdded(note: Note): Promise<void> {
-    await expect(this.modal).not.toBeVisible();
+  async verifyNote(note: Note): Promise<void> {
     await expect(
-      this.noteCard
-        .filter({ hasText: note.getTitle() })
-        .locator(this.noteCardTitle),
+      this.noteCardTitle.filter({ hasText: note.getTitle() }),
     ).toHaveText(note.getTitle());
 
     await expect(
-      this.noteCard
-        .filter({ hasText: note.getDescription() })
-        .locator(this.noteCardDescription),
+      this.noteCardDescription.filter({ hasText: note.getDescription() }),
     ).toHaveText(note.getDescription());
   }
 
   async deleteNote(note: Note): Promise<void> {
-    await this.verifyNoteAdded(note);
-    await this.noteCard
-      .filter({ hasText: note.getTitle() })
-      .locator(this.noteDeleteButton)
-      .click();
-    await this.modalDeleteButton.click();
+    try {
+      await this.noteCard
+        .filter({ hasText: note.getTitle() })
+        .locator(this.noteDeleteButton)
+        .click();
+      await this.modalDeleteButton.click();
+    } catch (error) {
+      throw new Error(`Failed to delete note "${note.getTitle()}": ${error}`);
+    }
   }
 
   async submitNoteForm(): Promise<void> {
@@ -122,14 +114,7 @@ export class NotesPage {
     });
 
     await noteCardToEdit.locator(this.noteEditButton).click();
-    await this.categoryDropdown.selectOption(updatedNote.getCategory());
-    if (updatedNote.getCompleted()) {
-      await this.completedCheckbox.check();
-    } else {
-      await this.completedCheckbox.uncheck();
-    }
-    await this.titleInput.fill(updatedNote.getTitle());
-    await this.descriptionInput.fill(updatedNote.getDescription());
+    await this.fillNoteForm(updatedNote);
     await this.createButton.click();
     await expect(this.createButton).not.toBeVisible();
   }
@@ -150,11 +135,40 @@ export class NotesPage {
       case NOTE_CATEGORIES.HOME:
         await this.homeCategory.click();
         break;
+      default:
+        throw new Error(`Unknown category: ${category}`);
     }
   }
 
   async searchNoteByTitle(query: string): Promise<void> {
     await this.searchInput.fill(query);
     await this.searchButton.click();
+    await expect(this.noteCardTitle.filter({ hasText: query })).toBeVisible();
+  }
+
+  async openNoteDetails(note: Note): Promise<void> {
+    const noteCardToView = this.noteCard.filter({
+      hasText: note.getTitle(),
+    });
+    await noteCardToView.locator(this.noteViewButton).click();
+  }
+
+  async verifyNoteDetails(note: Note): Promise<void> {
+    await expect(this.page.getByTestId("note-card-title")).toHaveText(
+      note.getTitle(),
+    );
+    await expect(this.page.getByTestId("note-card-description")).toHaveText(
+      note.getDescription(),
+    );
+    await expect(this.page.getByTestId("note-card-updated-at")).toHaveText(
+      note.getUpdatedAt(true)!,
+    );
+  }
+
+  private async fillNoteForm(note: Note): Promise<void> {
+    await this.categoryDropdown.selectOption(note.getCategory());
+    await this.completedCheckbox.setChecked(note.getCompleted());
+    await this.titleInput.fill(note.getTitle());
+    await this.descriptionInput.fill(note.getDescription());
   }
 }

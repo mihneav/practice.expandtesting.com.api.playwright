@@ -6,9 +6,9 @@ import { StatusCodes } from "http-status-codes";
 import { API_ENDPOINTS, API_MESSAGES, HTTP_HEADERS } from "@utils/constants";
 
 test.describe("Notes API", () => {
-  test.afterEach(async ({ authenticatedUser, deleteUser }) => {
+  test.afterEach(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser.getToken()) {
-      await deleteUser(authenticatedUser);
+      await deleteUserAccount(authenticatedUser);
     }
   });
 
@@ -50,7 +50,7 @@ test.describe("Notes API", () => {
   test("GET /notes/{id}", async ({
     request,
     authenticatedUser,
-    generateNote,
+    apiCreatedNote,
   }) => {
     const note = authenticatedUser.getNotes()[0];
     const response = await sendRequest(
@@ -84,7 +84,7 @@ test.describe("Notes API", () => {
   test("PUT /notes/{id}", async ({
     request,
     authenticatedUser,
-    generateNote,
+    apiCreatedNote,
   }) => {
     const note = authenticatedUser.getNotes()[0];
     const response = await sendRequest(
@@ -131,7 +131,7 @@ test.describe("Notes API", () => {
   test("PATCH /notes/{id}", async ({
     request,
     authenticatedUser,
-    generateNote,
+    apiCreatedNote,
   }) => {
     const note = authenticatedUser.getNotes()[0];
     const response = await sendRequest(
@@ -172,7 +172,7 @@ test.describe("Notes API", () => {
     request,
     apiContext,
     authenticatedUser,
-    generateNote,
+    apiCreatedNote,
   }) => {
     const response = await deleteNoteApi(
       apiContext,

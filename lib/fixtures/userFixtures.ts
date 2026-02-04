@@ -42,7 +42,7 @@ const registerUser = async (
   }
 };
 
-const loginUser = async (
+export const loginUser = async (
   apiContext: APIRequestContext,
   user: User,
 ): Promise<void> => {

@@ -1,5 +1,5 @@
-import { test } from "@lib/baseE2eTest";
-import { expect } from "@playwright/test";
+import { test, expect } from "@lib/baseE2eTest";
+
 import { StatusCodes } from "http-status-codes";
 import { expectSuccessResponse } from "@utils/assertions";
 import { sendRequest } from "@utils/helpers";
@@ -11,10 +11,10 @@ import {
 } from "@utils/constants";
 
 test.describe.serial("User API", () => {
-  test.afterAll(async ({ authenticatedUser, deleteUser }) => {
+  test.afterAll(async ({ authenticatedUser, deleteUserAccount }) => {
     if (authenticatedUser?.getToken?.()) {
       try {
-        await deleteUser(authenticatedUser);
+        await deleteUserAccount(authenticatedUser);
       } catch (error) {
         console.log(`User cleanup skipped: ${error}`);
       }

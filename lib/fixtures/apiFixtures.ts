@@ -10,8 +10,8 @@ import { sendRequest } from "@utils/helpers";
 
 export type ApiFixtures = {
   apiContext: APIRequestContext;
-  deleteUser: (user: User) => Promise<APIResponse>;
-  deleteNote: (user: User, note: Note) => Promise<APIResponse>;
+  deleteUserAccount: (user: User) => Promise<APIResponse>;
+  deleteNoteById: (user: User, note: Note) => Promise<APIResponse>;
 };
 
 export const apiFixtures = {
@@ -23,7 +23,7 @@ export const apiFixtures = {
     await context.dispose();
   },
 
-  deleteUser: async (
+  deleteUserAccount: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: (user: User) => Promise<APIResponse>) => Promise<void>,
   ) => {
@@ -46,7 +46,7 @@ export const apiFixtures = {
     await use(deleteUserFn);
   },
 
-  deleteNote: async (
+  deleteNoteById: async (
     { apiContext }: { apiContext: APIRequestContext },
     use: (r: (user: User, note: Note) => Promise<APIResponse>) => Promise<void>,
   ) => {
